@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  // lets comment smth
+  // lets check branching
   runApp(MyApp());
 }
 
