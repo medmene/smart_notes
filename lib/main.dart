@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       theme: _buildShrineTheme(),
       title: 'RP Helper',
-      debugShowCheckedModeBanner: false,
+      //debugShowCheckedModeBanner: false,
       home: MyHomePage(),
     );
   }
@@ -67,10 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ],
         ),
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[fillBodyContent()],
-        ));
+        body: fillBodyContent());
   }
 }
 
