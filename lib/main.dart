@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'info_page.dart';
+import 'inventory_page.dart';
+import 'skill_page.dart';
 
 void main() => runApp(MyApp());
 
@@ -7,7 +10,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: _buildShrineTheme(),
-      title: 'Flutter Demo',
+      title: 'RP Helper',
       debugShowCheckedModeBanner: false,
       home: MyHomePage(),
     );
@@ -22,44 +25,52 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _currentIndex = 0;
 
+  Widget fillBodyContent() {
+    if (_currentIndex == 0) {
+      return infoPageContent();
+    } else if (_currentIndex == 1) {
+      return inventoryPageContent();
+    } else if (_currentIndex == 2) {
+      return skillPageContent();
+    } else {
+      return infoPageContent();
+    }
+  }
+
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     return Scaffold(
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        currentIndex: _currentIndex,
-        backgroundColor: colorScheme.surface,
-        selectedItemColor: colorScheme.onSurface,
-        unselectedItemColor: colorScheme.onSurface.withOpacity(.60),
-        selectedLabelStyle: textTheme.caption,
-        unselectedLabelStyle: textTheme.caption,
-        onTap: (value) {
-          // Respond to item press.
-          setState(() => _currentIndex = value);
-        },
-        items: [
-          BottomNavigationBarItem(
-            label: 'Favorites',
-            icon: Icon(Icons.favorite),
-          ),
-          BottomNavigationBarItem(
-            label: 'Music',
-            icon: Icon(Icons.music_note),
-          ),
-          BottomNavigationBarItem(
-            label: 'Places',
-            icon: Icon(Icons.location_on),
-          ),
-          BottomNavigationBarItem(
-            label: 'News',
-            //title: Text('News'),
-            icon: Icon(Icons.library_books),
-          ),
-        ],
-      ),
-      //body: Widget(),
-    );
+        bottomNavigationBar: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          currentIndex: _currentIndex,
+          backgroundColor: colorScheme.surface,
+          selectedItemColor: colorScheme.onSurface,
+          unselectedItemColor: colorScheme.onSurface.withOpacity(.60),
+          selectedLabelStyle: textTheme.caption,
+          unselectedLabelStyle: textTheme.caption,
+          onTap: (value) {
+            setState(() => _currentIndex = value);
+          },
+          items: [
+            BottomNavigationBarItem(
+              label: 'Info',
+              icon: Icon(Icons.account_circle, size: 32),
+            ),
+            BottomNavigationBarItem(
+              label: 'Inventory',
+              icon: Icon(Icons.backpack, size: 32),
+            ),
+            BottomNavigationBarItem(
+              label: 'Skills',
+              icon: Icon(Icons.add_moderator, size: 32),
+            ),
+          ],
+        ),
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[fillBodyContent()],
+        ));
   }
 }
 
@@ -113,7 +124,7 @@ const Color shrinePink100 = Color(0xFFFEDBD0);
 const Color shrinePink300 = Color(0xFFFBB8AC);
 const Color shrinePink400 = Color(0xFFEAA4A4);
 
-const Color shrineBrown900 = Color(0xFF442B2D);
+const Color shrineBrown900 = Color(0xFF0D47A1);
 const Color shrineBrown600 = Color(0xFF7D4F52);
 
 const Color shrineErrorRed = Color(0xFFC5032B);
@@ -122,24 +133,3 @@ const Color shrineSurfaceWhite = Color(0xFFFFFBFA);
 const Color shrineBackgroundWhite = Colors.white;
 
 const defaultLetterSpacing = 0.03;
-
-//        Scaffold(
-//           appBar: AppBar(
-//             bottom: TabBar(
-//               tabs: [
-//                 Tab(icon: Icon(Icons.directions_car)),
-//                 Tab(icon: Icon(Icons.directions_transit)),
-//                 Tab(icon: Icon(Icons.directions_bike)),
-//               ],
-//             ),
-//             title: Text('Tabs Demo'),
-//           ),
-//           body: TabBarView(
-//             children: [
-//               Icon(Icons.directions_car),
-//               Icon(Icons.directions_transit),
-//               Icon(Icons.directions_bike),
-//             ],
-//           ),
-//         ),
-//       ),
