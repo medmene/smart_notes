@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 
-Widget inventoryPageContent() {
-  return Column(
+class InventoryPage {
+  Column _view = new Column(
     mainAxisAlignment: MainAxisAlignment.center,
     children: <Widget>[
       new Align(
         alignment: Alignment.bottomCenter,
         child: new ButtonBar(
           alignment: MainAxisAlignment.center,
-          children: <Widget>[Icon(Icons.access_alarm_outlined, size: 32)],
+          children: <Widget>[Icon(Icons.backpack, size: 32)],
         ),
       )
     ],
   );
+
+  Widget getContent() {
+    return _view;
+  }
 }
