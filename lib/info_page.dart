@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-Widget infoPageContent() {
-  return Column(
+class InfoPage {
+  Column _view = new Column(
     mainAxisAlignment: MainAxisAlignment.center,
     children: <Widget>[
       new Align(
@@ -13,4 +13,8 @@ Widget infoPageContent() {
       )
     ],
   );
+
+  Widget getContent() {
+    return _view;
+  }
 }

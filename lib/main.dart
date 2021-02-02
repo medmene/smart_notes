@@ -24,16 +24,25 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _currentIndex = 0;
+  SkillPage _skillPage;
+  InfoPage _infoPage;
+  InventoryPage _inventoryPage;
+
+  _MyHomePageState() {
+    _skillPage = new SkillPage(this);
+    _infoPage = new InfoPage();
+    _inventoryPage = new InventoryPage();
+  }
 
   Widget fillBodyContent() {
     if (_currentIndex == 0) {
-      return infoPageContent();
+      return _infoPage.getContent();
     } else if (_currentIndex == 1) {
-      return inventoryPageContent();
+      return _inventoryPage.getContent();
     } else if (_currentIndex == 2) {
-      return skillPageContent();
+      return _skillPage;
     } else {
-      return infoPageContent();
+      return _infoPage.getContent();
     }
   }
 
