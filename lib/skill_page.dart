@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'tools.dart';
+import 'section.dart';
 
 class SkillPage extends StatefulWidget {
   State _owner;
@@ -34,6 +34,8 @@ class SkillPageState extends State<SkillPage> {
             });
           },
         ),
+        IconButton(
+            icon: const Icon(Icons.edit), tooltip: 'Edit', onPressed: () {}),
         PopupMenuButton(
           icon: const Icon(Icons.more_vert),
           itemBuilder: (BuildContext bc) {
