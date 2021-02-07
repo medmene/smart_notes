@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'section_item.dart';
+import 'section_settings.dart';
 
 class Section extends StatefulWidget {
   State _owner; // to save internal data
@@ -24,6 +26,9 @@ class SectionState extends State<Section> {
   String _title;
   bool _last;
   bool _expanded = true;
+  SectionSettings _stgs = SectionSettings(3);
+  // todo: add internal content with types
+  // List<SectionItem> _itemList;
 
   void setIsLast(bool isLast) {
     _last = isLast;
@@ -62,8 +67,16 @@ class SectionState extends State<Section> {
         ),
       ],
     ));
-    if (_expanded) l.add(Text("asd")); // todo: add internal content with types
-    if (!_last) l.add(Divider());
+    if (_expanded) l.add(SectionItemRow(_stgs)); //l.add(Text("asd"));
+    if (!_last)
+      l.add(SizedBox(
+          height: 5.0,
+          child: Center(
+              child: Container(
+                  margin: EdgeInsetsDirectional.only(start: 10.0, end: 10.0),
+                  height: 3.0,
+                  color: Colors.blue))));
+    // if (!_last) l.add(Divider(thickness: 2, color: Colors.blue));
     return l;
   }
 
