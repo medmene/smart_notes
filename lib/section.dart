@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'section_item.dart';
-import 'section_settings.dart';
+import 'properties.dart';
+import 'property_dialog.dart';
 
 class Section extends StatefulWidget {
   State _owner; // to save internal data
@@ -20,15 +21,16 @@ class Section extends StatefulWidget {
   }
 }
 
+// todo: add rename and remove functional
 class SectionState extends State<Section> {
   State _owner; // to save internal data
   TextStyle _style = TextStyle(fontSize: 18, fontWeight: FontWeight.w700);
   String _title;
   bool _last;
   bool _expanded = true;
-  SectionSettings _stgs = SectionSettings(3);
-  // todo: add internal content with types
-  // List<SectionItem> _itemList;
+  SectionProperties _settings = SectionProperties(1);
+  PropertyDialog _stgDialog = PropertyDialog();
+  List<SectionItem> _itemList = List<SectionItem>();
 
   void setIsLast(bool isLast) {
     _last = isLast;
@@ -40,21 +42,34 @@ class SectionState extends State<Section> {
     l.add(Row(
       children: <Widget>[
         Expanded(
-            child: GestureDetector(
-                onTap: () {
-                  bool newExpanded = !_expanded;
-                  setState(() {
-                    _expanded = newExpanded;
-                  });
+          child: GestureDetector(
+            onTap: () {
+              bool newExpanded = !_expanded;
+              setState(
+                () {
+                  _expanded = newExpanded;
                 },
-                child:
-                    Text(_title, style: _style, textAlign: TextAlign.center))),
+              );
+            },
+            child: Text(_title, style: _style, textAlign: TextAlign.center),
+          ),
+        ),
         Spacer(),
         IconButton(
           iconSize: 30,
           icon: const Icon(Icons.add),
           tooltip: 'Add content',
-          onPressed: () {},
+          onPressed: () {
+            _stgDialog.onDone = () {
+              _settings = _stgDialog.refreshedSettings;
+              _itemList.add(SectionItemRow(_settings));
+              var list = _itemList;
+              setState(() {
+                _itemList = list;
+              });
+            };
+            _stgDialog.openDialog(context, _settings);
+          },
         ),
         PopupMenuButton(
           icon: const Icon(Icons.more_vert),
@@ -67,15 +82,22 @@ class SectionState extends State<Section> {
         ),
       ],
     ));
-    if (_expanded) l.add(SectionItemRow(_stgs)); //l.add(Text("asd"));
+    if (_expanded) {
+      // todo add all rows here
+      _itemList.forEach((element) {
+        l.add(element);
+      });
+    }
     if (!_last)
       l.add(SizedBox(
-          height: 5.0,
-          child: Center(
-              child: Container(
-                  margin: EdgeInsetsDirectional.only(start: 10.0, end: 10.0),
-                  height: 3.0,
-                  color: Colors.blue))));
+        height: 5.0,
+        child: Center(
+          child: Container(
+              margin: EdgeInsetsDirectional.only(start: 10.0, end: 10.0),
+              height: 3.0,
+              color: Colors.blue),
+        ),
+      ));
     // if (!_last) l.add(Divider(thickness: 2, color: Colors.blue));
     return l;
   }

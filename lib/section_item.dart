@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'section_settings.dart';
+import 'properties.dart';
 
 // zero type, atomic - textWidget
 class TextWidget extends StatefulWidget {
   TextWidgetState _currentState;
   int _index;
   bool _last = false;
+  bool _summator = false;
 
   // get text in text field
   String getText() {
@@ -16,12 +17,13 @@ class TextWidget extends StatefulWidget {
     _currentState.setValue(text);
   }
 
-  TextWidget(this._index, {bool last = false}) {
+  TextWidget(this._index, {bool last = false, bool summator = false}) {
     _last = last;
+    _summator = summator;
   }
   @override
   createState() {
-    _currentState = TextWidgetState(this._index, this._last);
+    _currentState = TextWidgetState(this._index, this._last, this._summator);
     return _currentState;
   }
 }
@@ -31,9 +33,10 @@ class TextWidgetState extends State<TextWidget> {
   TextStyle _style;
   int _index;
   bool _last = false;
+  bool _summator = false;
 
-  TextWidgetState(this._index, this._last) {
-    _style = TextStyle(fontSize: 16); // set smth for first widget
+  TextWidgetState(this._index, this._last, this._summator) {
+    _style = TextStyle(fontSize: 22);
   }
 
   void setValue(String text) {
@@ -45,14 +48,35 @@ class TextWidgetState extends State<TextWidget> {
   }
 
   List<Widget> _getWidgets() {
+    Color c = Colors.white;
+    if (_index == 0) {
+      c = Colors.lightBlue[100];
+    }
+    if (_summator) {
+      c = Colors.orange[100];
+    }
+
     List<Widget> l = List<Widget>();
     l.add(Flexible(
-        child: TextField(
-            controller: _textCtr, style: _style, textAlign: TextAlign.center)));
+      child: TextField(
+        controller: _textCtr,
+        style: _style,
+        textAlign: TextAlign.center,
+        decoration: InputDecoration(
+          contentPadding: EdgeInsets.only(bottom: 8.0, top: 8.0),
+          border: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.white),
+            borderRadius: BorderRadius.circular(5),
+          ),
+          filled: true,
+          fillColor: c,
+        ),
+      ),
+    ));
     if (_index == 0) {
-      if (!_last) l.add(Icon(Icons.dehaze));
-    } else if (!_last) {
-      l.add(SizedBox(width: 20));
+      if (!_last) l.add(SizedBox(width: 30, child: Icon(Icons.dehaze)));
+    } else {
+      l.add(SizedBox(width: 30));
     }
     return l;
   }
@@ -77,10 +101,10 @@ class SectionItem extends StatefulWidget {
   createState() {}
 }
 
-// first type - row
+// todo: add summator
 class SectionItemRow extends SectionItem {
   SectionItemRowState _currentState;
-  SectionSettings _settings;
+  SectionProperties _settings;
 
   SectionItemRow(this._settings);
   @override
@@ -91,7 +115,7 @@ class SectionItemRow extends SectionItem {
 }
 
 class SectionItemRowState extends State<SectionItemRow> {
-  SectionSettings _settings;
+  SectionProperties _settings;
   List<TextWidget> _row = List<TextWidget>();
   SectionItemRowState(this._settings);
 
