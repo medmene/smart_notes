@@ -2,44 +2,33 @@ import 'package:flutter/material.dart';
 import 'properties.dart';
 
 // zero type, atomic - textWidget
-class TextWidget extends StatefulWidget {
-  TextWidgetState _currentState;
-  int _index;
-  bool _last = false;
-  bool _summator = false;
-
-  // get text in text field
-  String getText() {
-    return _currentState.getText();
-  }
-
-  void setValue(String text) {
-    _currentState.setValue(text);
-  }
-
-  TextWidget(this._index, {bool last = false, bool summator = false}) {
-    _last = last;
-    _summator = summator;
-  }
-  @override
-  createState() {
-    _currentState = TextWidgetState(this._index, this._last, this._summator);
-    return _currentState;
-  }
-}
-
-class TextWidgetState extends State<TextWidget> {
+class TextWidget extends StatelessWidget {
+  SectionItemRow _owner;
   TextEditingController _textCtr = TextEditingController();
   TextStyle _style;
   int _index;
   bool _last = false;
   bool _summator = false;
 
-  TextWidgetState(this._index, this._last, this._summator) {
+  TextWidget(this._owner, this._index,
+      {bool last = false, bool summator = false, bool initByZero = false}) {
+    _last = last;
+    _summator = summator;
     _style = TextStyle(fontSize: 22);
+    if (initByZero) {
+      _textCtr.text = "0";
+    }
   }
 
-  void setValue(String text) {
+  bool isSummator() {
+    return _summator;
+  }
+
+  void _onChanged(String) {
+    _owner.onChanged();
+  }
+
+  void setText(String text) {
     _textCtr.text = text;
   }
 
@@ -60,6 +49,7 @@ class TextWidgetState extends State<TextWidget> {
     l.add(Flexible(
       child: TextField(
         controller: _textCtr,
+        onChanged: _onChanged,
         style: _style,
         textAlign: TextAlign.center,
         decoration: InputDecoration(
@@ -89,43 +79,53 @@ class TextWidgetState extends State<TextWidget> {
   @override
   void dispose() {
     _textCtr.dispose();
-    super.dispose();
   }
 }
 
 /////////////////////////
 
 // interface or base class
-class SectionItem extends StatefulWidget {
+// other items: image, progressbar
+class SectionItem extends StatelessWidget {
   @override
-  createState() {}
-}
-
-// todo: add summator
-class SectionItemRow extends SectionItem {
-  SectionItemRowState _currentState;
-  SectionProperties _settings;
-
-  SectionItemRow(this._settings);
-  @override
-  createState() {
-    _currentState = SectionItemRowState(_settings);
-    return _currentState;
+  Widget build(BuildContext context) {
+    return Column();
   }
 }
 
-class SectionItemRowState extends State<SectionItemRow> {
+class SectionItemRow extends SectionItem {
   SectionProperties _settings;
   List<TextWidget> _row = List<TextWidget>();
-  SectionItemRowState(this._settings);
+  SectionItemRow(this._settings);
+
+  void onChanged() {
+    int sum = 0;
+    _row.forEach((element) {
+      if (!element.isSummator()) {
+        int val = int.tryParse(element.getText());
+        if (val != null) {
+          sum += val;
+        } else {
+          sum += 0;
+        }
+      }
+    });
+    if (_settings.sumIndex != -1) {
+      _row[_settings.sumIndex].setText(sum.toString());
+    }
+  }
 
   Widget _getItemsRow() {
-    _row = List<TextWidget>();
-    if (_settings.itemsCount == 1) {
-      _row.add(TextWidget(0, last: true));
-    } else {
-      for (var i = 0; i < _settings.itemsCount; i++) {
-        _row.add(new TextWidget(i, last: i == _settings.itemsCount - 1));
+    if (_row.isEmpty) {
+      if (_settings.itemsCount == 1) {
+        _row.add(TextWidget(this, 0, last: true));
+      } else {
+        for (var i = 0; i < _settings.itemsCount; i++) {
+          _row.add(new TextWidget(this, i,
+              last: i == _settings.itemsCount - 1,
+              summator: i == _settings.sumIndex,
+              initByZero: _settings.sumIndex != -1));
+        }
       }
     }
     return Padding(
