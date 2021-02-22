@@ -5,25 +5,40 @@ import 'property_dialog.dart';
 import 'page_base.dart';
 
 class Section extends StatefulWidget {
+  int _index;
   IPage _owner;
   SectionProperties _settings;
   bool _last;
   SectionState _currentState;
 
   void setIsLast(bool isLast) {
+    _last = isLast;
     _currentState.setIsLast(isLast);
   }
 
-  Section(this._owner, this._settings, this._last);
+  void setIndex(int index) {
+    _index = index;
+    _currentState.setIndex(index);
+  }
+
+  void refreshSelf() {
+    if (_currentState != null) {
+      _currentState.refreshSelf();
+    }
+  }
+
+  Section(this._owner, this._settings, this._last, this._index);
   @override
   createState() {
-    _currentState = SectionState(this._owner, this._settings, this._last);
+    _currentState =
+        SectionState(this._owner, this._settings, this._last, this._index);
     return _currentState;
   }
 }
 
 // todo: add rename and remove functional
 class SectionState extends State<Section> {
+  int _index;
   IPage _owner;
   TextStyle _style = TextStyle(fontSize: 18, fontWeight: FontWeight.w700);
   SectionProperties _sectionSettings;
@@ -35,7 +50,26 @@ class SectionState extends State<Section> {
 
   void setIsLast(bool isLast) {
     _last = isLast;
+  }
+
+  void setIndex(int index) {
+    _index = index;
+  }
+
+  void refreshSelf() {
     setState(() {});
+  }
+
+  void onSelectPopup(String item) {
+    if (item == "settings") {
+      _stgDialog.onDone = () {
+        _sectionSettings = _stgDialog.refreshedSettings;
+        setState(() {});
+      };
+      _stgDialog.openDialog(context, _sectionSettings);
+    } else if (item == "delete") {
+      _owner.onSectionDeleted(this._index);
+    }
   }
 
   List<Widget> _generateOutContent() {
@@ -77,10 +111,11 @@ class SectionState extends State<Section> {
           icon: const Icon(Icons.more_vert),
           itemBuilder: (BuildContext bc) {
             return [
-              PopupMenuItem(child: Text("Rename"), value: "/newchat"),
-              PopupMenuItem(child: Text("Delete"), value: "/settings"),
+              PopupMenuItem(child: Text("Settings"), value: "settings"),
+              PopupMenuItem(child: Text("Delete"), value: "delete"),
             ];
           },
+          onSelected: onSelectPopup,
         ),
       ],
     ));
@@ -100,11 +135,10 @@ class SectionState extends State<Section> {
               color: Colors.blue),
         ),
       ));
-    // if (!_last) l.add(Divider(thickness: 2, color: Colors.blue));
     return l;
   }
 
-  SectionState(this._owner, this._sectionSettings, this._last);
+  SectionState(this._owner, this._sectionSettings, this._last, this._index);
   @override
   Widget build(BuildContext context) {
     return Column(children: _generateOutContent());

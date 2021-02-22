@@ -6,9 +6,20 @@ import 'properties.dart';
 
 class SkillPage extends IPage {
   State _owner;
+  SkillPageState _currentState;
+
   SkillPage(this._owner);
+
   @override
-  createState() => new SkillPageState(this);
+  void onSectionDeleted(int index) {
+    _currentState.onSectionDeleted(index);
+  }
+
+  @override
+  createState() {
+    _currentState = SkillPageState(this);
+    return _currentState;
+  }
 }
 
 class SkillPageState extends State<SkillPage> {
@@ -18,6 +29,31 @@ class SkillPageState extends State<SkillPage> {
   SectionProperties _settings = SectionProperties("Section");
 
   SkillPageState(this._self);
+
+  void onSectionDeleted(int index) {
+    if (index > -1 && index < _listContent.length) {
+      var list = List<Section>();
+      list.insertAll(0, _listContent);
+      list.forEach((element) {
+        element.setIsLast(false);
+      });
+      list.removeAt(index);
+      for (var i = 0; i < list.length; i++) {
+        list[i].setIndex(i);
+        if (i == list.length - 1) {
+          list[i].setIsLast(true);
+        }
+      }
+
+      setState(() {
+        _listContent.clear();
+        _listContent.insertAll(0, list);
+        _listContent.forEach((element) {
+          element.refreshSelf();
+        });
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,13 +65,19 @@ class SkillPageState extends State<SkillPage> {
           onPressed: () {
             _stgDialog.onDone = () {
               _settings = _stgDialog.refreshedSettings;
-              var list = _listContent;
+              var list = List<Section>();
+              list.insertAll(0, _listContent);
               list.forEach((element) {
                 element.setIsLast(false);
               });
-              list.add(Section(_self, _settings, true));
+              list.add(Section(_self, _settings, true, list.length));
+
               setState(() {
-                _listContent = list;
+                _listContent.clear();
+                _listContent.insertAll(0, list);
+                _listContent.forEach((element) {
+                  element.refreshSelf();
+                });
               });
             };
             _stgDialog.openDialog(context, _settings);
