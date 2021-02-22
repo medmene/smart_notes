@@ -94,7 +94,7 @@ class SectionItem extends StatelessWidget {
 }
 
 class SectionItemRow extends SectionItem {
-  SectionProperties _settings;
+  SectionItemProperties _settings;
   List<TextWidget> _row = List<TextWidget>();
   SectionItemRow(this._settings);
 

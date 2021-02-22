@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
 import 'section.dart';
+import 'page_base.dart';
+import 'property_dialog.dart';
+import 'properties.dart';
 
-class SkillPage extends StatefulWidget {
+class SkillPage extends IPage {
   State _owner;
   SkillPage(this._owner);
   @override
-  createState() => new SkillPageState(this._owner);
+  createState() => new SkillPageState(this);
 }
 
 class SkillPageState extends State<SkillPage> {
-  State _owner; // to save data after use
+  IPage _self;
   List<Section> _listContent = List<Section>();
+  PropertyDialog _stgDialog = PropertyDialog();
+  SectionProperties _settings = SectionProperties("Section");
 
-  SkillPageState(this._owner);
+  SkillPageState(this._self);
 
   @override
   Widget build(BuildContext context) {
@@ -22,16 +27,18 @@ class SkillPageState extends State<SkillPage> {
           icon: const Icon(Icons.add),
           tooltip: 'Add new section',
           onPressed: () {
-            // Swap random text to real Section
-            var list = _listContent;
-            list.forEach((element) {
-              element.setIsLast(false);
-            });
-            list.add(Section(
-                _owner, "Section" + (list.length + 1).toString(), true));
-            setState(() {
-              _listContent = list;
-            });
+            _stgDialog.onDone = () {
+              _settings = _stgDialog.refreshedSettings;
+              var list = _listContent;
+              list.forEach((element) {
+                element.setIsLast(false);
+              });
+              list.add(Section(_self, _settings, true));
+              setState(() {
+                _listContent = list;
+              });
+            };
+            _stgDialog.openDialog(context, _settings);
           },
         ),
         IconButton(
@@ -49,11 +56,13 @@ class SkillPageState extends State<SkillPage> {
         ),
       ]),
       Expanded(
-          child: ListView.builder(
-              itemCount: _listContent.length,
-              itemBuilder: (BuildContext ctxt, int indx) {
-                return _listContent[indx];
-              }))
+        child: ListView.builder(
+          itemCount: _listContent.length,
+          itemBuilder: (BuildContext ctxt, int indx) {
+            return _listContent[indx];
+          },
+        ),
+      )
     ]);
   }
 }
