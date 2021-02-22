@@ -6,10 +6,15 @@ import 'properties.dart';
 class ProreptyWidget extends StatelessWidget {
   TextEditingController _textCtr = TextEditingController();
   String _propName;
+  bool _focus = false;
 
   ProreptyWidget(Pair content) {
     _textCtr.text = content.second.toString();
     _propName = content.first.toString();
+  }
+
+  void setFocus(bool focus) {
+    _focus = focus;
   }
 
   Pair<String, dynamic> getField() {
@@ -19,6 +24,7 @@ class ProreptyWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      autofocus: _focus,
       controller: _textCtr,
       decoration: InputDecoration(
         labelText: _propName,
@@ -39,6 +45,9 @@ class PropertyDialog {
     props.forEach((element) {
       _fields.add(ProreptyWidget(element));
     });
+    if (_fields.isNotEmpty) {
+      _fields.first.setFocus(true);
+    }
     return _fields;
   }
 
