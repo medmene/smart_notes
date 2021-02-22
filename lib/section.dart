@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'section_item.dart';
 import 'properties.dart';
 import 'property_dialog.dart';
+import 'page_base.dart';
 
 class Section extends StatefulWidget {
-  State _owner; // to save internal data
-  String _title;
+  IPage _owner;
+  SectionProperties _settings;
   bool _last;
   SectionState _currentState;
 
@@ -13,22 +14,22 @@ class Section extends StatefulWidget {
     _currentState.setIsLast(isLast);
   }
 
-  Section(this._owner, this._title, this._last);
+  Section(this._owner, this._settings, this._last);
   @override
   createState() {
-    _currentState = SectionState(this._owner, this._title, this._last);
+    _currentState = SectionState(this._owner, this._settings, this._last);
     return _currentState;
   }
 }
 
 // todo: add rename and remove functional
 class SectionState extends State<Section> {
-  State _owner; // to save internal data
+  IPage _owner;
   TextStyle _style = TextStyle(fontSize: 18, fontWeight: FontWeight.w700);
-  String _title;
+  SectionProperties _sectionSettings;
   bool _last;
   bool _expanded = true;
-  SectionProperties _settings = SectionProperties(1);
+  SectionItemProperties _itemSettings = SectionItemProperties(1);
   PropertyDialog _stgDialog = PropertyDialog();
   List<SectionItem> _itemList = List<SectionItem>();
 
@@ -51,7 +52,8 @@ class SectionState extends State<Section> {
                 },
               );
             },
-            child: Text(_title, style: _style, textAlign: TextAlign.center),
+            child: Text(_sectionSettings.name,
+                style: _style, textAlign: TextAlign.center),
           ),
         ),
         Spacer(),
@@ -61,14 +63,14 @@ class SectionState extends State<Section> {
           tooltip: 'Add content',
           onPressed: () {
             _stgDialog.onDone = () {
-              _settings = _stgDialog.refreshedSettings;
-              _itemList.add(SectionItemRow(_settings));
+              _itemSettings = _stgDialog.refreshedSettings;
+              _itemList.add(SectionItemRow(_itemSettings));
               var list = _itemList;
               setState(() {
                 _itemList = list;
               });
             };
-            _stgDialog.openDialog(context, _settings);
+            _stgDialog.openDialog(context, _itemSettings);
           },
         ),
         PopupMenuButton(
@@ -102,7 +104,7 @@ class SectionState extends State<Section> {
     return l;
   }
 
-  SectionState(this._owner, this._title, this._last);
+  SectionState(this._owner, this._sectionSettings, this._last);
   @override
   Widget build(BuildContext context) {
     return Column(children: _generateOutContent());
