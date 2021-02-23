@@ -1,27 +1,30 @@
 import 'package:flutter/material.dart';
-import 'page_base.dart';
 import 'sections_controller.dart';
 
-class SkillPage extends IPage {
-  dynamic _owner;
-
-  SkillPage(this._owner);
-
+class SkillPage extends StatefulWidget {
   @override
-  createState() => SkillPageState(this._owner);
+  createState() => SkillPageState();
 }
 
 class SkillPageState extends State<SkillPage> {
-  dynamic _owner;
   bool _editing = false;
+  bool _expanded = false;
   SectionsController _ctr = SectionsController(false);
-
-  SkillPageState(this._owner);
 
   @override
   Widget build(BuildContext context) {
     return Column(children: [
       AppBar(title: const Text('Skill Page'), actions: <Widget>[
+        IconButton(
+          icon: Icon(_expanded ? Icons.arrow_upward : Icons.arrow_downward),
+          tooltip: 'Expand',
+          onPressed: () {
+            setState(() {
+              _expanded = !_expanded;
+              _ctr.setExpanded(_expanded);
+            });
+          },
+        ),
         IconButton(
           icon: const Icon(Icons.add),
           tooltip: 'Add new section',

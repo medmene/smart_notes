@@ -1,4 +1,3 @@
-import 'package:dnd_app/section_item.dart';
 import 'package:flutter/material.dart';
 import 'section.dart';
 import 'property_dialog.dart';
@@ -9,6 +8,10 @@ class SectionsController extends StatefulWidget {
   bool _editing = false;
 
   SectionsController(this._editing);
+
+  void setExpanded(bool expandex) {
+    _state.setExpanded(expandex);
+  }
 
   void add() {
     _state.add();
@@ -40,6 +43,14 @@ class SectionsControllerState extends State<SectionsController> {
   bool _editing = false;
 
   SectionsControllerState(this._editing);
+
+  void setExpanded(bool expanded) {
+    setState(() {
+      _data.forEach((element) {
+        element.expanded = expanded;
+      });
+    });
+  }
 
   void setEditing(bool editing) {
     setState(() {

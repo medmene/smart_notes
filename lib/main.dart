@@ -24,59 +24,48 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _currentIndex = 0;
-  SkillPage _skillPage;
-  InfoPage _infoPage;
-  InventoryPage _inventoryPage;
-
-  _MyHomePageState() {
-    _skillPage = new SkillPage(this);
-    _infoPage = new InfoPage();
-    _inventoryPage = new InventoryPage();
-  }
-
-  Widget fillBodyContent() {
-    if (_currentIndex == 0) {
-      return _infoPage.getContent();
-    } else if (_currentIndex == 1) {
-      return _inventoryPage.getContent();
-    } else if (_currentIndex == 2) {
-      return _skillPage;
-    } else {
-      return _infoPage.getContent();
-    }
-  }
+  static const TextStyle optionStyle =
+      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
 
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     return Scaffold(
-        bottomNavigationBar: BottomNavigationBar(
-          type: BottomNavigationBarType.fixed,
-          currentIndex: _currentIndex,
-          backgroundColor: colorScheme.surface,
-          selectedItemColor: colorScheme.onSurface,
-          unselectedItemColor: colorScheme.onSurface.withOpacity(.60),
-          selectedLabelStyle: textTheme.caption,
-          unselectedLabelStyle: textTheme.caption,
-          onTap: (value) {
-            setState(() => _currentIndex = value);
-          },
-          items: [
-            BottomNavigationBarItem(
-              label: 'Info',
-              icon: Icon(Icons.account_circle, size: 32),
-            ),
-            BottomNavigationBarItem(
-              label: 'Inventory',
-              icon: Icon(Icons.backpack, size: 32),
-            ),
-            BottomNavigationBarItem(
-              label: 'Skills',
-              icon: Icon(Icons.add_moderator, size: 32),
-            ),
-          ],
-        ),
-        body: fillBodyContent());
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        currentIndex: _currentIndex,
+        backgroundColor: colorScheme.surface,
+        selectedItemColor: colorScheme.onSurface,
+        unselectedItemColor: colorScheme.onSurface.withOpacity(.60),
+        selectedLabelStyle: textTheme.caption,
+        unselectedLabelStyle: textTheme.caption,
+        onTap: (value) {
+          setState(() => _currentIndex = value);
+        },
+        items: [
+          BottomNavigationBarItem(
+            label: 'Info',
+            icon: Icon(Icons.account_circle, size: 32),
+          ),
+          BottomNavigationBarItem(
+            label: 'Inventory',
+            icon: Icon(Icons.backpack, size: 32),
+          ),
+          BottomNavigationBarItem(
+            label: 'Skills',
+            icon: Icon(Icons.add_moderator, size: 32),
+          ),
+        ],
+      ),
+      body: IndexedStack(
+        children: <Widget>[
+          Center(child: Text('Index 0: Info', style: optionStyle)),
+          Center(child: Text('Index 1: Inventory', style: optionStyle)),
+          SkillPage(),
+        ],
+        index: _currentIndex,
+      ),
+    );
   }
 }
 
