@@ -1,12 +1,13 @@
-class Pair<T1, T2> {
+class Triple<T1, T2, T3> {
   final T1 first;
   final T2 second;
+  final T2 third;
 
-  Pair(this.first, this.second);
+  Triple(this.first, this.second, this.third);
 }
 
 class IProperties {
-  List<Pair<String, dynamic>> getPropertyList() {}
+  List<Triple<String, String, String>> getPropertyList() {}
   void setProperty(String prop, value) {}
   IProperties clone(dynamic other) {}
 }
@@ -27,10 +28,11 @@ class SectionItemProperties implements IProperties {
   }
 
   @override
-  List<Pair<String, int>> getPropertyList() {
-    List<Pair<String, int>> l = List<Pair<String, int>>();
-    l.add(Pair("Summator", sumIndex));
-    l.add(Pair("Items", itemsCount));
+  List<Triple<String, String, String>> getPropertyList() {
+    List<Triple<String, String, String>> l =
+        List<Triple<String, String, String>>();
+    l.add(Triple("Summator", sumIndex.toString(), "int"));
+    l.add(Triple("Items", itemsCount.toString(), "int"));
     return l;
   }
 
@@ -71,11 +73,12 @@ class SectionProperties implements IProperties {
   }
 
   @override
-  List<Pair<String, dynamic>> getPropertyList() {
-    List<Pair<String, String>> l = List<Pair<String, String>>();
-    l.add(Pair("Name", name));
-    l.add(Pair("Max", maxCount.toString()));
-    l.add(Pair("Enabled(y/n)", enabled ? "y" : "n"));
+  List<Triple<String, String, String>> getPropertyList() {
+    List<Triple<String, String, String>> l =
+        List<Triple<String, String, String>>();
+    l.add(Triple("Name", name, "string"));
+    l.add(Triple("Max", maxCount.toString(), "int"));
+    l.add(Triple("Enabled", enabled ? "true" : "false", "bool"));
     return l;
   }
 
@@ -88,7 +91,7 @@ class SectionProperties implements IProperties {
       if (maxVal != null) {
         maxCount = maxVal;
       }
-    } else if (prop == "Enabled(y/n)") {
+    } else if (prop == "Enabled") {
       var enblVal = value.toString();
       if (enblVal == "y") {
         enabled = true;

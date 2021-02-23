@@ -3,34 +3,87 @@ import 'properties.dart';
 
 // some bug in this page
 
-class ProreptyWidget extends StatelessWidget {
-  TextEditingController _textCtr = TextEditingController();
-  String _propName;
+class ProreptyWidget extends StatefulWidget {
+  Triple _content;
+  ProreptyWidgetState _state;
   bool _focus = false;
 
-  ProreptyWidget(Pair content) {
-    _textCtr.text = content.second.toString();
+  ProreptyWidget(this._content);
+
+  void setFocus(bool focus) {
+    _focus = focus;
+    if (_state != null) {
+      _state.setFocus(focus);
+    }
+  }
+
+  Triple<String, String, String> getField() {
+    return _state.getField();
+  }
+
+  @override
+  createState() {
+    _state = ProreptyWidgetState(this._content, this._focus);
+    return _state;
+  }
+}
+
+class ProreptyWidgetState extends State<ProreptyWidget> {
+  TextEditingController _textCtr = TextEditingController();
+  String _propName;
+  String _type;
+  String _checkBoxVal;
+  bool _checkedValue = false;
+  bool _focus = false;
+
+  ProreptyWidgetState(Triple content, this._focus) {
+    _type = content.third.toString();
     _propName = content.first.toString();
+    if (_type == "bool") {
+      _checkBoxVal = content.second.toString();
+      _checkedValue = _checkBoxVal == "true";
+    } else if (_type == "int" || _type == "string") {
+      _textCtr.text = content.second.toString();
+    }
   }
 
   void setFocus(bool focus) {
     _focus = focus;
   }
 
-  Pair<String, dynamic> getField() {
-    return Pair(_propName, _textCtr.text);
+  Triple<String, String, String> getField() {
+    if (_type == "bool") {
+      return Triple(_propName, _checkBoxVal, _type);
+    } else if (_type == "int" || _type == "string") {
+      return Triple(_propName, _textCtr.text, _type);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      autofocus: _focus,
-      controller: _textCtr,
-      decoration: InputDecoration(
-        labelText: _propName,
-        icon: Icon(Icons.account_box),
-      ),
-    );
+    Widget w;
+    if (_type == "int" || _type == "string") {
+      w = TextFormField(
+        autofocus: _focus,
+        controller: _textCtr,
+        decoration: InputDecoration(
+          labelText: _propName,
+          // icon: Icon(Icons.account_box),
+        ),
+      );
+    } else if (_type == "bool") {
+      w = CheckboxListTile(
+        title: Text(_propName),
+        value: _checkedValue,
+        onChanged: (newValue) {
+          setState(() {
+            _checkBoxVal = newValue ? "true" : "false";
+            _checkedValue = newValue;
+          });
+        },
+      );
+    }
+    return w;
   }
 }
 
