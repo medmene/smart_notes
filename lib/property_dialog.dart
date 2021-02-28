@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'properties.dart';
 
-// some bug in this page
-
-class ProreptyWidget extends StatefulWidget {
+// [Row] of settings dialog
+class PropertyWidget extends StatefulWidget {
   Triple _content;
-  ProreptyWidgetState _state;
+  PropertyWidgetState _state;
   bool _focus = false;
 
-  ProreptyWidget(this._content);
+  PropertyWidget(this._content);
 
   void setFocus(bool focus) {
     _focus = focus;
@@ -23,12 +22,12 @@ class ProreptyWidget extends StatefulWidget {
 
   @override
   createState() {
-    _state = ProreptyWidgetState(this._content, this._focus);
+    _state = PropertyWidgetState(this._content, this._focus);
     return _state;
   }
 }
 
-class ProreptyWidgetState extends State<ProreptyWidget> {
+class PropertyWidgetState extends State<PropertyWidget> {
   TextEditingController _textCtr = TextEditingController();
   String _propName;
   String _type;
@@ -36,7 +35,7 @@ class ProreptyWidgetState extends State<ProreptyWidget> {
   bool _checkedValue = false;
   bool _focus = false;
 
-  ProreptyWidgetState(Triple content, this._focus) {
+  PropertyWidgetState(Triple content, this._focus) {
     _type = content.third.toString();
     _propName = content.first.toString();
     if (_type == "bool") {
@@ -87,21 +86,160 @@ class ProreptyWidgetState extends State<ProreptyWidget> {
   }
 }
 
+class GroupWidget extends StatefulWidget {
+  GroupWidgetState _state;
+  IProperties refreshedSettings;
+  String _initSelected;
+
+  GroupWidget(this.refreshedSettings, this._initSelected);
+
+  List<PropertyWrapper> gatherData() {
+    return _state.gatherData();
+  }
+
+  @override
+  createState() {
+    _state = GroupWidgetState(this.refreshedSettings, this._initSelected);
+    return _state;
+  }
+}
+
+class GroupWidgetState extends State<GroupWidget> {
+  IProperties refreshedSettings;
+  List<Widget> _fields = List<Widget>();
+  String _radioSwitcher = "";
+
+  GroupWidgetState(this.refreshedSettings, this._radioSwitcher);
+
+  List<PropertyWrapper> gatherData() {
+    List<PropertyWrapper> l = List<PropertyWrapper>();
+    var props = refreshedSettings.getPropertyList();
+
+    if (_fields.isNotEmpty) {
+      if (_fields.first is Row) {
+        for (int i = 0; i < props.length; ++i) {
+          Row row = _fields[i];
+          Radio r = row.children[0];
+          l.add(PropertyWrapper(true,
+              grpdata: Pair(
+                r.value,
+                r.value == _radioSwitcher,
+              )));
+        }
+
+        if (props.length < _fields.length) {
+          var list = List<Triple<String, String, String>>();
+
+          for (int i = props.length; i < _fields.length; ++i) {
+            PropertyWidget w = _fields[i];
+            list.add(w.getField());
+          }
+          l.forEach((element) {
+            if (element.groupData.second) {
+              element.items = list;
+              return;
+            }
+          });
+        }
+      } else {
+        var list = List<Triple<String, String, String>>();
+        _fields.forEach((element) {
+          PropertyWidget w = element;
+          list.add(w.getField());
+        });
+        l.add(PropertyWrapper(false, itemList: list));
+      }
+    }
+    return l;
+  }
+
+  List<Widget> getFields() {
+    _fields.clear();
+
+    var props = refreshedSettings.getPropertyList();
+
+    bool hasGruops = false;
+    props.forEach((element) {
+      hasGruops = element.group ? true : hasGruops;
+    });
+
+    if (hasGruops) {
+      props.forEach((grp) {
+        _fields.add(Row(
+          children: [
+            Radio(
+              value: grp.groupData.first,
+              groupValue: _radioSwitcher,
+              onChanged: (String value) {
+                _radioSwitcher = value;
+
+                setState(() {
+                  _radioSwitcher = value;
+                });
+              },
+            ),
+            SizedBox(width: 20),
+            Text(grp.groupData.first),
+          ],
+        ));
+      });
+
+      // set radio btn sub fields
+      props.forEach((grp) {
+        if (_radioSwitcher == grp.groupData.first && grp.items != null) {
+          grp.items.forEach((props) {
+            _fields.add(PropertyWidget(props));
+          });
+        }
+      });
+
+      // set focus on first
+      if (_fields.length > props.length) {
+        PropertyWidget w = _fields[props.length];
+        w.setFocus(true);
+      }
+    } else {
+      props.forEach((grp) {
+        if (grp.items != null) {
+          grp.items.forEach((props) {
+            _fields.add(PropertyWidget(props));
+          });
+        }
+      });
+
+      if (_fields.isNotEmpty && _fields.first is PropertyWidget) {
+        PropertyWidget w = _fields.first;
+        w.setFocus(true);
+      }
+    }
+
+    return _fields;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: getFields());
+  }
+}
+
+// [Dialog] for edit setting
 class PropertyDialog {
   IProperties refreshedSettings;
   Function onDone;
-  List<ProreptyWidget> _fields;
+  GroupWidget _body;
 
-  List<ProreptyWidget> getFields() {
-    _fields = List<ProreptyWidget>();
+  Widget getBody() {
     var props = refreshedSettings.getPropertyList();
+
+    String initSelected = "";
     props.forEach((element) {
-      _fields.add(ProreptyWidget(element));
+      if (element.group) {
+        initSelected = element.groupData.first;
+      }
     });
-    if (_fields.isNotEmpty) {
-      _fields.first.setFocus(true);
-    }
-    return _fields;
+
+    _body = GroupWidget(refreshedSettings, initSelected);
+    return _body;
   }
 
   void openDialog(context, IProperties stng) {
@@ -117,17 +255,14 @@ class PropertyDialog {
           content: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Form(
-              child: Column(children: getFields()),
+              child: getBody(),
             ),
           ),
           actions: [
             RaisedButton(
               child: Text("OK"),
               onPressed: () {
-                _fields.forEach((element) {
-                  var field = element.getField();
-                  refreshedSettings.setProperty(field.first, field.second);
-                });
+                refreshedSettings.setProperty(_body.gatherData());
                 Navigator.pop(dialogContext);
                 onDone();
               },

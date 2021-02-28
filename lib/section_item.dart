@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'properties.dart';
+import 'section.dart';
 
 // zero type, atomic - textWidget
 class TextWidget extends StatelessWidget {
@@ -10,8 +11,13 @@ class TextWidget extends StatelessWidget {
   bool _last = false;
   bool _summator = false;
 
-  TextWidget(this._owner, this._index,
-      {bool last = false, bool summator = false, bool initByZero = false}) {
+  TextWidget(
+    this._owner,
+    this._index, {
+    bool last = false,
+    bool summator = false,
+    bool initByZero = false,
+  }) {
     _last = last;
     _summator = summator;
     _style = TextStyle(fontSize: 22);
@@ -75,28 +81,35 @@ class TextWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Flexible(child: Row(children: _getWidgets()));
   }
-
-  @override
-  void dispose() {
-    _textCtr.dispose();
-  }
 }
 
 /////////////////////////
 
-// interface or base class
-// other items: image, progressbar
-class SectionItem extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Column();
+// [Factory] create item by settings
+class SectionFactory {
+  static SectionItem createItem(Section parent, SectionItemProperties props) {
+    if (props.type == ItemType.row) {
+      return SectionItemRow(parent, props);
+    } else if (props.type == ItemType.image) {
+      return SectionItemImage(parent, props);
+    } else if (props.type == ItemType.progressbar) {
+      return SectionItemProgressbar(parent, props);
+    }
   }
 }
 
-class SectionItemRow extends SectionItem {
+// Interface
+class SectionItem {
+  Widget getBody() {}
+}
+
+// [Row] item
+class SectionItemRow implements SectionItem {
   SectionItemProperties _settings;
   List<TextWidget> _row = List<TextWidget>();
-  SectionItemRow(this._settings);
+  Section _parent;
+
+  SectionItemRow(this._parent, this._settings);
 
   void onChanged() {
     int sum = 0;
@@ -113,6 +126,7 @@ class SectionItemRow extends SectionItem {
     if (_settings.sumIndex != -1) {
       _row[_settings.sumIndex].setText(sum.toString());
     }
+    // _parent.refresh();
   }
 
   Widget _getItemsRow() {
@@ -135,7 +149,33 @@ class SectionItemRow extends SectionItem {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget getBody() {
     return _getItemsRow();
+  }
+}
+
+// [Image] item
+class SectionItemImage implements SectionItem {
+  SectionItemProperties _settings;
+  Section _parent;
+
+  SectionItemImage(this._parent, this._settings);
+
+  @override
+  Widget getBody() {
+    return Column();
+  }
+}
+
+// [Progressbar] item
+class SectionItemProgressbar implements SectionItem {
+  SectionItemProperties _settings;
+  Section _parent;
+
+  SectionItemProgressbar(this._parent, this._settings);
+
+  @override
+  Widget getBody() {
+    return Column();
   }
 }

@@ -10,15 +10,19 @@ class Section {
   bool expanded = false;
   bool editingMode = false;
   List<SectionItem> _itemList = List<SectionItem>();
-  SectionItemProperties _itemSettings = SectionItemProperties(1);
+  SectionItemProperties _itemSettings = SectionItemProperties();
   SectionsController _ctr;
 
   Section(this._ctr, this._sectionSettings, this.editingMode);
 
+  void refresh() {
+    _ctr.refresh();
+  }
+
   void _add(context) {
     _stgDialog.onDone = () {
       _itemSettings = _stgDialog.refreshedSettings;
-      _itemList.add(SectionItemRow(_itemSettings));
+      _itemList.add(SectionFactory.createItem(this, _itemSettings));
       _ctr.refresh();
     };
     _stgDialog.openDialog(context, _itemSettings);
@@ -69,6 +73,10 @@ class Section {
   }
 
   Widget getBody() {
-    return Column(children: _itemList);
+    List<Widget> l = List<Widget>();
+    _itemList.forEach((element) {
+      l.add(element.getBody());
+    });
+    return Column(children: l);
   }
 }
