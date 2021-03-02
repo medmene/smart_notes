@@ -171,11 +171,39 @@ class SectionItemImage implements SectionItem {
 class SectionItemProgressbar implements SectionItem {
   SectionItemProperties _settings;
   Section _parent;
+  double _progress = 40;
+  double _maxProgress = 100;
 
   SectionItemProgressbar(this._parent, this._settings);
 
+  void setProgress(double progress) {
+    _progress = progress > _maxProgress ? _maxProgress : progress;
+    _progress = _progress < 0 ? 0 : _progress;
+    _parent.refresh();
+  }
+
+  double _currentProgress() {
+    var val = _progress / _maxProgress;
+    val = val > 1 ? 1 : val;
+    return val;
+  }
+
   @override
   Widget getBody() {
-    return Column();
+    return Column(
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Container(
+            height: 20,
+            child: LinearProgressIndicator(
+              backgroundColor: Colors.black54,
+              valueColor: new AlwaysStoppedAnimation<Color>(Colors.purple[700]),
+              value: _currentProgress(),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
