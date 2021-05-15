@@ -1,6 +1,7 @@
-# dnd_app
+# SMART NOTES
 
 A new Flutter project.
+Something like smart notes primary created for dnd and pathfinder character stats helping
 
 ## Getting Started
 
