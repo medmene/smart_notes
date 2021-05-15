@@ -198,7 +198,7 @@ class SectionItemProgressbar implements SectionItem {
             height: 20,
             child: LinearProgressIndicator(
               backgroundColor: Colors.black54,
-              valueColor: new AlwaysStoppedAnimation<Color>(Colors.purple[700]),
+              valueColor: new AlwaysStoppedAnimation<Color>(Colors.purple),
               value: _currentProgress(),
             ),
           ),
